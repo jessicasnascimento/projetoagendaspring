@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -17,6 +16,7 @@ public class AgendaService {
     @Autowired
     private AgendaRepository repository;
 
+    @Transactional(readOnly = true)
     public List<AgendaDTO> listar() {
         List<Agenda> lista = repository.findAll();
         List<AgendaDTO> listaDto = new ArrayList<>();
