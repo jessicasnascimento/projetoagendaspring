@@ -1,23 +1,25 @@
 package br.com.sistema.sistema.entities;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
-@Data
 @Entity
-@Table(name = "TB_AGENDA")
-public class Agenda {
+@Data
+@NoArgsConstructor
+@Table(name = "TB_CLIENTE")
+public class Cliente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Integer id;
 
-    private String descricao;
+    private String nome;
 
-    private LocalDateTime dataHora;
+    private Number idade;
 
-    private LocalDateTime criadoEm;
+    private String profissao;
 
 }

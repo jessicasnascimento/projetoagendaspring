@@ -24,4 +24,14 @@ public class AgendaController {
         return agendaService.incluir(dto);
     }
 
+    @PutMapping("/{id}")
+    public AgendaDTO atualizar(@PathVariable Integer id, @RequestBody AgendaDTO dto) {
+        return agendaService.atualizar(id, dto);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deletar(@PathVariable Integer id) {
+        agendaService.deletar(id);
+    }
+
 }

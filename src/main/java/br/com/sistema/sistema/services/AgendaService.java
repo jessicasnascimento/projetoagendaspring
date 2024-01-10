@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AgendaService {
@@ -31,9 +33,33 @@ public class AgendaService {
         Agenda novaAgenda = new Agenda();
         novaAgenda.setDescricao(dto.getDescricao());
         novaAgenda.setDataHora(dto.getDataHora());
-
+        novaAgenda.setCriadoEm(LocalDateTime.now());
         novaAgenda = repository.save(novaAgenda);
 
         return new AgendaDTO(novaAgenda);
     }
+
+    @Transactional
+    public AgendaDTO atualizar(Integer id, AgendaDTO dto){
+        Optional<Agenda> agendaOptional = repository.findById(id);
+        if(agendaOptional.isPresent()){
+            Agenda agenda = agendaOptional.get();
+            agenda.setDescricao(dto.getDescricao());
+            agenda.setDataHora(dto.getDataHora());
+            agenda = repository.save(agenda);
+            return new AgendaDTO(agenda);
+        }
+        return new AgendaDTO();
+    }
+
+    @Transactional
+    public void deletar(Integer id) {
+        Optional<Agenda> agendaOptional = repository.findById(id);
+        if(agendaOptional.isPresent()){
+            Agenda agenda = agendaOptional.get();
+            repository.delete(agenda);
+        }
+    }
+
+
 }
