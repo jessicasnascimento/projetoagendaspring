@@ -48,8 +48,9 @@ public class AgendaService {
             agenda.setDataHora(dto.getDataHora());
             agenda = repository.save(agenda);
             return new AgendaDTO(agenda);
+        }else{
+            throw new RuntimeException("Não é possível atualizar uma Agenda inexistente!");
         }
-        return new AgendaDTO();
     }
 
     @Transactional
@@ -58,8 +59,12 @@ public class AgendaService {
         if(agendaOptional.isPresent()){
             Agenda agenda = agendaOptional.get();
             repository.delete(agenda);
+        }else{
+            throw new RuntimeException("Não é possível deletar uma Agenda inexistente!");
         }
     }
+
+
 
 
 }

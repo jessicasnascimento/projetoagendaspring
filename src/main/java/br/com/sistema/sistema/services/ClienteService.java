@@ -49,8 +49,9 @@ public class ClienteService {
             cliente = repository.save(cliente);
 
             return new ClienteDTO(cliente);
+        }else{
+            throw new RuntimeException("Não é possível atualizar um Cliente inexistente!");
         }
-        return new ClienteDTO();
     }
 
     @Transactional
@@ -59,7 +60,8 @@ public class ClienteService {
         if(clienteOptional.isPresent()){
             Cliente cliente = clienteOptional.get();
             repository.delete(cliente);
+        }else{
+            throw new RuntimeException("Não é possível excluir um Cliente inexistente!");
         }
     }
-
 }
