@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Data
@@ -20,5 +21,8 @@ public class Cliente {
     private Number idade;
 
     private String profissao;
+
+    @OneToMany(mappedBy = "cliente")
+    private List<Agendamento> agendamentos;
 
 }

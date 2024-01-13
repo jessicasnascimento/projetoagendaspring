@@ -1,10 +1,10 @@
 package br.com.sistema.sistema.repositories;
 
-import br.com.sistema.sistema.entities.Agenda;
+import br.com.sistema.sistema.entities.Agendamento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AgendaRepository extends JpaRepository<Agenda, Integer> {
+public interface AgendamentoRepository extends JpaRepository<Agendamento, Integer> {
 
 }

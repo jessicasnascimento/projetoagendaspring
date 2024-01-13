@@ -1,6 +1,6 @@
 package br.com.sistema.sistema.dtos;
 
-import br.com.sistema.sistema.entities.Agenda;
+import br.com.sistema.sistema.entities.Agendamento;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
-public class AgendaDTO {
+public class AgendamentoDTO {
 
     private Integer id;
 
@@ -16,10 +16,14 @@ public class AgendaDTO {
 
     private LocalDateTime dataHora;
 
-    public AgendaDTO(Agenda entity) {
+    private PrestadorDTO prestadorDTO;
+
+    public AgendamentoDTO(Agendamento entity) {
         id = entity.getId();
         descricao = entity.getDescricao();
         dataHora = entity.getDataHora();
+
+        prestadorDTO = new PrestadorDTO(entity.getPrestador());
     }
 
 }

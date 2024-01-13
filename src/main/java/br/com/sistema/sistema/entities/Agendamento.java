@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table(name = "TB_AGENDA")
-public class Agenda {
+public class Agendamento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,5 +19,13 @@ public class Agenda {
     private LocalDateTime dataHora;
 
     private LocalDateTime criadoEm;
+
+    @ManyToOne
+    @JoinColumn(name = "prestador_id")
+    private Prestador prestador;
+
+    @ManyToOne
+    @JoinColumn(name = "cliente_id")
+    private Cliente cliente;
 
 }
