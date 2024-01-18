@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -35,18 +35,18 @@ public class AgendamentoService {
     @Transactional
     public AgendamentoDTO incluir(AgendamentoDTO dto) {
         Optional<Prestador> prestador = prestadorRepository.findById(dto.getPrestadorDTO().getId());
-        if(prestador.isEmpty()){
-            throw new RuntimeException("Não é possível incluir um agendamento para um prestador inexistente!");
-        }
+        validarAgendamento(dto, prestador);
 
         Agendamento novoAgendamento = new Agendamento();
         novoAgendamento.setDescricao(dto.getDescricao());
-        novoAgendamento.setDataHora(dto.getDataHora());
-        novoAgendamento.setCriadoEm(LocalDateTime.now());
+        novoAgendamento.setData(dto.getData());
+        novoAgendamento.setHoraInicio(dto.getHoraInicio());
+        novoAgendamento.setHoraFim(dto.getHoraFim());
         novoAgendamento.setPrestador(prestador.get());
-        novoAgendamento = repository.save(novoAgendamento);
 
-        return new AgendamentoDTO(novoAgendamento);
+        // Lógica para incluir o agendamento após a validação
+        Agendamento agendamentoSalvo = repository.save(novoAgendamento);
+        return new AgendamentoDTO(agendamentoSalvo);
     }
 
     @Transactional
@@ -55,7 +55,9 @@ public class AgendamentoService {
         if(agendaOptional.isPresent()){
             Agendamento agendamento = agendaOptional.get();
             agendamento.setDescricao(dto.getDescricao());
-            agendamento.setDataHora(dto.getDataHora());
+            agendamento.setData(dto.getData());
+            agendamento.setHoraInicio(dto.getHoraInicio());
+            agendamento.setHoraFim(dto.getHoraFim());
             agendamento = repository.save(agendamento);
             return new AgendamentoDTO(agendamento);
         }else{
@@ -74,7 +76,32 @@ public class AgendamentoService {
         }
     }
 
+    public void  validarAgendamento(AgendamentoDTO dto, Optional<Prestador> prestador) {
+        if(prestador.isEmpty()){
+            throw new RuntimeException("Não é possível incluir um agendamento para um prestador inexistente!");
+        }
 
+        List<Agendamento> agendamentosNoMesmoDia = repository.findByData(dto.getData());
+
+        for (Agendamento existente : agendamentosNoMesmoDia) {
+            // Verifica se há sobreposição de horários com intervalo mínimo de 30 minutos
+            if (horariosSobrepostosComIntervalo(existente, dto, 30)) {
+                throw new RuntimeException("Agendamento inválido. Motivo: Só podem ser feitos agendamentos no intervalo de 30min de um para outro!");
+            }
+        }
+    }
+
+    private boolean horariosSobrepostosComIntervalo(Agendamento existente, AgendamentoDTO dto, long minutosDeIntervalo) {
+        // Verifica se há sobreposição de horários
+        boolean overlap = dto.getHoraInicio().isBefore(existente.getHoraFim()) &&
+                dto.getHoraFim().isAfter(existente.getHoraInicio());
+
+        // Verifica se o intervalo é menor que o mínimo permitido (30 minutos)
+        boolean intervaloMenorQuePermitido = ChronoUnit.MINUTES.between(existente.getHoraFim(), dto.getHoraInicio()) < minutosDeIntervalo
+                || ChronoUnit.MINUTES.between(dto.getHoraFim(), existente.getHoraInicio()) < minutosDeIntervalo;
+
+        return overlap && intervaloMenorQuePermitido;
+    }
 
 
 }

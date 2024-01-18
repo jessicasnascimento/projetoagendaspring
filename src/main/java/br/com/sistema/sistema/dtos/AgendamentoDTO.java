@@ -4,7 +4,8 @@ import br.com.sistema.sistema.entities.Agendamento;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Data
 @NoArgsConstructor
@@ -14,14 +15,20 @@ public class AgendamentoDTO {
 
     private String descricao;
 
-    private LocalDateTime dataHora;
+    private LocalDate data;
+
+    private LocalTime horaInicio;
+
+    private LocalTime horaFim;
 
     private PrestadorDTO prestadorDTO;
 
     public AgendamentoDTO(Agendamento entity) {
         id = entity.getId();
         descricao = entity.getDescricao();
-        dataHora = entity.getDataHora();
+        data = entity.getData();
+        horaInicio = entity.getHoraInicio();
+        horaFim = entity.getHoraFim();
 
         prestadorDTO = new PrestadorDTO(entity.getPrestador());
     }

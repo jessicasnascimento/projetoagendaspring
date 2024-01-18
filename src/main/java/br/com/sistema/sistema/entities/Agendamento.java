@@ -3,7 +3,8 @@ package br.com.sistema.sistema.entities;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Data
 @Entity
@@ -16,9 +17,11 @@ public class Agendamento {
 
     private String descricao;
 
-    private LocalDateTime dataHora;
+    private LocalDate data;
 
-    private LocalDateTime criadoEm;
+    private LocalTime horaInicio;
+
+    private LocalTime horaFim;
 
     @ManyToOne
     @JoinColumn(name = "prestador_id")
