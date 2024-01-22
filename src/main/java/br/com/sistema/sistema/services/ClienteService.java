@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +33,12 @@ public class ClienteService {
     public ClienteDTO incluir(ClienteDTO dto) {
         Cliente novoCliente = new Cliente();
         novoCliente.setNome(dto.getNome());
-        novoCliente.setIdade(dto.getIdade());
+        novoCliente.setEmail(dto.getEmail());
+        novoCliente.setDataNascimento(dto.getDataNascimento());
+
+        // Calcula a idade e define no cliente
+        novoCliente.setIdade(calcularIdade(dto));
+
         novoCliente.setProfissao(dto.getProfissao());
         novoCliente = repository.save(novoCliente);
 
@@ -44,7 +51,12 @@ public class ClienteService {
         if(clienteOptional.isPresent()){
             Cliente cliente = clienteOptional.get();
             cliente.setNome(dto.getNome());
-            cliente.setIdade(dto.getIdade());
+            cliente.setEmail(dto.getEmail());
+            cliente.setDataNascimento(dto.getDataNascimento());
+
+            // Calcula a idade e atualiza no cliente
+            cliente.setIdade(calcularIdade(dto));
+
             cliente.setProfissao(dto.getProfissao());
             cliente = repository.save(cliente);
 
@@ -64,4 +76,15 @@ public class ClienteService {
             throw new RuntimeException("Não é possível excluir um Cliente inexistente!");
         }
     }
+
+    public int calcularIdade(ClienteDTO dto) {
+        if (dto != null && dto.getDataNascimento() != null) {
+            LocalDate dataNascimento = dto.getDataNascimento();
+            LocalDate hoje = LocalDate.now();
+            return Period.between(dataNascimento, hoje).getYears();
+        } else {
+            throw new RuntimeException("Data de nascimento não fornecida.");
+        }
+    }
+
 }
