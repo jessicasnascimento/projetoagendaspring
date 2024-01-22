@@ -1,6 +1,7 @@
 package br.com.sistema.sistema.services;
 
 import br.com.sistema.sistema.dtos.AgendamentoDTO;
+import br.com.sistema.sistema.dtos.EmailDTO;
 import br.com.sistema.sistema.entities.Agendamento;
 import br.com.sistema.sistema.entities.Prestador;
 import br.com.sistema.sistema.repositories.AgendamentoRepository;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +23,9 @@ public class AgendamentoService {
     private AgendamentoRepository repository;
     @Autowired
     private PrestadorRepository prestadorRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     @Transactional(readOnly = true)
     public List<AgendamentoDTO> listar() {
@@ -38,6 +43,8 @@ public class AgendamentoService {
         validarAgendamento(dto, prestador);
 
         Agendamento novoAgendamento = new Agendamento();
+        novoAgendamento.setNomeCliente(dto.getNomeCliente());
+        novoAgendamento.setEmailCliente(dto.getEmailCliente());
         novoAgendamento.setDescricao(dto.getDescricao());
         novoAgendamento.setData(dto.getData());
         novoAgendamento.setHoraInicio(dto.getHoraInicio());
@@ -46,7 +53,27 @@ public class AgendamentoService {
 
         // Lógica para incluir o agendamento após a validação
         Agendamento agendamentoSalvo = repository.save(novoAgendamento);
+
+        // Envio do e-mail de confirmação
+        enviarEmailConfirmacaoAgendamento(novoAgendamento);
+
         return new AgendamentoDTO(agendamentoSalvo);
+    }
+
+    private void enviarEmailConfirmacaoAgendamento(Agendamento novoAgendamento) {
+        EmailDTO email = new EmailDTO();
+        email.setDestinatario(novoAgendamento.getEmailCliente());
+        email.setAssunto("Confirmação de Agendamento");
+        StringBuilder corpo = new StringBuilder();
+        corpo.append("Seu agendamento foi confirmado com sucesso.");
+        corpo.append("\n");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String dataFormatada = novoAgendamento.getData().format(formatter);
+        corpo.append("Data: " + dataFormatada);
+        corpo.append("\n");
+        corpo.append("Prestador: " + novoAgendamento.getPrestador().getNome());
+        email.setCorpo(corpo.toString());
+        emailService.enviarEmail(email);
     }
 
     @Transactional
@@ -54,6 +81,8 @@ public class AgendamentoService {
         Optional<Agendamento> agendaOptional = repository.findById(id);
         if(agendaOptional.isPresent()){
             Agendamento agendamento = agendaOptional.get();
+            agendamento.setNomeCliente(dto.getNomeCliente());
+            agendamento.setEmailCliente(dto.getEmailCliente());
             agendamento.setDescricao(dto.getDescricao());
             agendamento.setData(dto.getData());
             agendamento.setHoraInicio(dto.getHoraInicio());

@@ -23,6 +23,10 @@ public class Agendamento {
 
     private LocalTime horaFim;
 
+    private String nomeCliente;
+
+    private String emailCliente;
+
     @ManyToOne
     @JoinColumn(name = "prestador_id")
     private Prestador prestador;

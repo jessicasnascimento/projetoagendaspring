@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -17,6 +18,10 @@ public class Cliente {
     private Integer id;
 
     private String nome;
+
+    private String email;
+
+    private LocalDate dataNascimento;
 
     private Number idade;
 

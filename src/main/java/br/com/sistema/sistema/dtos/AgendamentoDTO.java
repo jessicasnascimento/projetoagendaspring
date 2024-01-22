@@ -12,16 +12,13 @@ import java.time.LocalTime;
 public class AgendamentoDTO {
 
     private Integer id;
-
     private String descricao;
-
     private LocalDate data;
-
     private LocalTime horaInicio;
-
     private LocalTime horaFim;
-
     private PrestadorDTO prestadorDTO;
+    private String nomeCliente;
+    private String emailCliente;
 
     public AgendamentoDTO(Agendamento entity) {
         id = entity.getId();
@@ -29,6 +26,8 @@ public class AgendamentoDTO {
         data = entity.getData();
         horaInicio = entity.getHoraInicio();
         horaFim = entity.getHoraFim();
+        nomeCliente = entity.getNomeCliente();
+        emailCliente = entity.getEmailCliente();
 
         prestadorDTO = new PrestadorDTO(entity.getPrestador());
     }
