@@ -33,11 +33,17 @@ public class ClienteService {
     public ClienteDTO incluir(ClienteDTO dto) {
         Cliente novoCliente = new Cliente();
         novoCliente.setNome(dto.getNome());
+        novoCliente.setCpf(dto.getCpf());
         novoCliente.setEmail(dto.getEmail());
         novoCliente.setDataNascimento(dto.getDataNascimento());
 
         // Calcula a idade e define no cliente
         novoCliente.setIdade(calcularIdade(dto));
+
+        //Validação para impedir o cadastro de CPFs duplicados
+        if (repository.existsByCpf(dto.getCpf())) {
+            throw new RuntimeException("CPF já cadastrado");
+        }
 
         novoCliente.setProfissao(dto.getProfissao());
         novoCliente = repository.save(novoCliente);
@@ -54,7 +60,7 @@ public class ClienteService {
             cliente.setEmail(dto.getEmail());
             cliente.setDataNascimento(dto.getDataNascimento());
 
-            // Calcula a idade e atualiza no cliente
+            //Calcula a idade e atualiza no cliente
             cliente.setIdade(calcularIdade(dto));
 
             cliente.setProfissao(dto.getProfissao());

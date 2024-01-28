@@ -11,6 +11,7 @@ public class ClienteDTO {
 
     private Integer id;
     private String nome;
+    private String cpf;
     private LocalDate dataNascimento;
     private Number idade;
     private String profissao;
@@ -19,6 +20,7 @@ public class ClienteDTO {
     public ClienteDTO(Cliente entity) {
         id = entity.getId();
         nome = entity.getNome();
+        cpf = entity.getCpf();
         dataNascimento = entity.getDataNascimento();
         idade = entity.getIdade();
         profissao = entity.getProfissao();
