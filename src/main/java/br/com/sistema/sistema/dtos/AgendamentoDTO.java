@@ -17,8 +17,8 @@ public class AgendamentoDTO {
     private LocalTime horaInicio;
     private LocalTime horaFim;
     private PrestadorDTO prestadorDTO;
-    private String nomeCliente;
-    private String emailCliente;
+
+    private ClienteDTO clienteDTO;
 
     public AgendamentoDTO(Agendamento entity) {
         id = entity.getId();
@@ -26,10 +26,9 @@ public class AgendamentoDTO {
         data = entity.getData();
         horaInicio = entity.getHoraInicio();
         horaFim = entity.getHoraFim();
-        nomeCliente = entity.getNomeCliente();
-        emailCliente = entity.getEmailCliente();
 
         prestadorDTO = new PrestadorDTO(entity.getPrestador());
+        clienteDTO = new ClienteDTO(entity.getCliente());
     }
 
 }

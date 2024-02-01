@@ -19,6 +19,11 @@ public class AgendamentoController {
         return agendamentoService.listar();
     }
 
+    @GetMapping("/cliente/{id}")
+    public List<AgendamentoDTO> listarAgendamentosCliente(@PathVariable Integer idCliente) {
+        return agendamentoService.listarAgendamentosCliente(idCliente);
+    }
+
     @PostMapping
     public AgendamentoDTO incluir(@RequestBody AgendamentoDTO dto) {
         return agendamentoService.incluir(dto);

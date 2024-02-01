@@ -1,10 +1,13 @@
 package br.com.sistema.sistema.services;
 
 import br.com.sistema.sistema.dtos.AgendamentoDTO;
+import br.com.sistema.sistema.dtos.ClienteDTO;
 import br.com.sistema.sistema.dtos.EmailDTO;
 import br.com.sistema.sistema.entities.Agendamento;
+import br.com.sistema.sistema.entities.Cliente;
 import br.com.sistema.sistema.entities.Prestador;
 import br.com.sistema.sistema.repositories.AgendamentoRepository;
+import br.com.sistema.sistema.repositories.ClienteRepository;
 import br.com.sistema.sistema.repositories.PrestadorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +18,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AgendamentoService {
@@ -23,6 +27,9 @@ public class AgendamentoService {
     private AgendamentoRepository repository;
     @Autowired
     private PrestadorRepository prestadorRepository;
+
+    @Autowired
+    private ClienteRepository clienteRepository;
 
     @Autowired
     private EmailService emailService;
@@ -40,16 +47,17 @@ public class AgendamentoService {
     @Transactional
     public AgendamentoDTO incluir(AgendamentoDTO dto) {
         Optional<Prestador> prestador = prestadorRepository.findById(dto.getPrestadorDTO().getId());
-        validarAgendamento(dto, prestador);
+        Optional<Cliente> cliente = clienteRepository.findById(dto.getClienteDTO().getId());
+
+        validarAgendamento(dto, prestador, cliente);
 
         Agendamento novoAgendamento = new Agendamento();
-        novoAgendamento.setNomeCliente(dto.getNomeCliente());
-        novoAgendamento.setEmailCliente(dto.getEmailCliente());
         novoAgendamento.setDescricao(dto.getDescricao());
         novoAgendamento.setData(dto.getData());
         novoAgendamento.setHoraInicio(dto.getHoraInicio());
         novoAgendamento.setHoraFim(dto.getHoraFim());
         novoAgendamento.setPrestador(prestador.get());
+        novoAgendamento.setCliente(cliente.get());
 
         // Lógica para incluir o agendamento após a validação
         Agendamento agendamentoSalvo = repository.save(novoAgendamento);
@@ -62,7 +70,7 @@ public class AgendamentoService {
 
     private void enviarEmailConfirmacaoAgendamento(Agendamento novoAgendamento) {
         EmailDTO email = new EmailDTO();
-        email.setDestinatario(novoAgendamento.getEmailCliente());
+        email.setDestinatario(novoAgendamento.getCliente().getEmail());
         email.setAssunto("Confirmação de Agendamento");
         StringBuilder corpo = new StringBuilder();
         corpo.append("Seu agendamento foi confirmado com sucesso.");
@@ -80,9 +88,9 @@ public class AgendamentoService {
     public AgendamentoDTO atualizar(Integer id, AgendamentoDTO dto){
         Optional<Agendamento> agendaOptional = repository.findById(id);
         if(agendaOptional.isPresent()){
+            Optional<Cliente> cliente = clienteRepository.findById(dto.getClienteDTO().getId());
             Agendamento agendamento = agendaOptional.get();
-            agendamento.setNomeCliente(dto.getNomeCliente());
-            agendamento.setEmailCliente(dto.getEmailCliente());
+            agendamento.setCliente(cliente.get());
             agendamento.setDescricao(dto.getDescricao());
             agendamento.setData(dto.getData());
             agendamento.setHoraInicio(dto.getHoraInicio());
@@ -105,9 +113,21 @@ public class AgendamentoService {
         }
     }
 
-    public void  validarAgendamento(AgendamentoDTO dto, Optional<Prestador> prestador) {
+    @Transactional(readOnly = true)
+    public List<AgendamentoDTO> listarAgendamentosCliente(Integer idCliente) {
+        List<Agendamento> agendamentosCliente = repository.findByClienteId(idCliente);
+        return agendamentosCliente.stream()
+                .map(item -> new AgendamentoDTO(item))
+                .collect(Collectors.toList());
+    }
+
+    public void  validarAgendamento(AgendamentoDTO dto, Optional<Prestador> prestador, Optional<Cliente> cliente) {
         if(prestador.isEmpty()){
             throw new RuntimeException("Não é possível incluir um agendamento para um prestador inexistente!");
+        }
+
+        if(cliente.isEmpty()){
+            throw new RuntimeException("Não é possível incluir um agendamento para um cliente inexistente!");
         }
 
         List<Agendamento> agendamentosNoMesmoDia = repository.findByData(dto.getData());
