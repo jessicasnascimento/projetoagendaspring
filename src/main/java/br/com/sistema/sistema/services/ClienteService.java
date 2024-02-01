@@ -3,12 +3,11 @@ package br.com.sistema.sistema.services;
 import br.com.sistema.sistema.entities.Cliente;
 import br.com.sistema.sistema.dtos.ClienteDTO;
 import br.com.sistema.sistema.repositories.ClienteRepository;
+import br.com.sistema.sistema.utils.DataUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -38,7 +37,7 @@ public class ClienteService {
         novoCliente.setDataNascimento(dto.getDataNascimento());
 
         // Calcula a idade e define no cliente
-        novoCliente.setIdade(calcularIdade(dto));
+        novoCliente.setIdade(DataUtil.calcularIdade(dto.getDataNascimento()));
 
         //Validação para impedir o cadastro de CPFs duplicados
         if (repository.existsByCpf(dto.getCpf())) {
@@ -61,7 +60,7 @@ public class ClienteService {
             cliente.setDataNascimento(dto.getDataNascimento());
 
             //Calcula a idade e atualiza no cliente
-            cliente.setIdade(calcularIdade(dto));
+            cliente.setIdade(DataUtil.calcularIdade(dto.getDataNascimento()));
 
             cliente.setProfissao(dto.getProfissao());
             cliente = repository.save(cliente);
@@ -80,16 +79,6 @@ public class ClienteService {
             repository.delete(cliente);
         }else{
             throw new RuntimeException("Não é possível excluir um Cliente inexistente!");
-        }
-    }
-
-    public int calcularIdade(ClienteDTO dto) {
-        if (dto != null && dto.getDataNascimento() != null) {
-            LocalDate dataNascimento = dto.getDataNascimento();
-            LocalDate hoje = LocalDate.now();
-            return Period.between(dataNascimento, hoje).getYears();
-        } else {
-            throw new RuntimeException("Data de nascimento não fornecida.");
         }
     }
 
