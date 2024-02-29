@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -50,6 +51,16 @@ public class AgendamentoService {
         Optional<Cliente> cliente = clienteRepository.findById(dto.getClienteDTO().getId());
 
         validarAgendamento(dto, prestador, cliente);
+
+        // Obter a data e hora atuais
+        LocalDateTime horaAtual = LocalDateTime.now();
+
+        // Verificar se o agendamento é retroativo ao horário atual
+        if (dto.getData().isBefore(horaAtual.toLocalDate()) ||
+                (dto.getData().isEqual(horaAtual.toLocalDate()) && dto.getHoraInicio().isBefore(horaAtual.toLocalTime()))) {
+            throw new IllegalArgumentException("Não é permitido fazer agendamentos retroativos.");
+        }
+
 
         Agendamento novoAgendamento = new Agendamento();
         novoAgendamento.setDescricao(dto.getDescricao());
