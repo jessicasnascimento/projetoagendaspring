@@ -52,6 +52,15 @@ public class AgendamentoService {
 
         validarAgendamento(dto, prestador, cliente);
 
+        // Obter a data e hora atuais
+        LocalDateTime horaAtual = LocalDateTime.now();
+
+        // Verificar se o agendamento é retroativo ao horário atual
+        if (dto.getData().isBefore(horaAtual.toLocalDate()) ||
+                (dto.getData().isEqual(horaAtual.toLocalDate()) && dto.getHoraInicio().isBefore(horaAtual.toLocalTime()))) {
+            throw new IllegalArgumentException("Não é permitido fazer agendamentos retroativos.");
+        }
+
         Agendamento novoAgendamento = new Agendamento();
         novoAgendamento.setDescricao(dto.getDescricao());
         novoAgendamento.setData(dto.getData());
