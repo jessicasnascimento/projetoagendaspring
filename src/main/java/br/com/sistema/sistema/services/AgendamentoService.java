@@ -61,7 +61,6 @@ public class AgendamentoService {
             throw new IllegalArgumentException("Não é permitido fazer agendamentos retroativos.");
         }
 
-
         Agendamento novoAgendamento = new Agendamento();
         novoAgendamento.setDescricao(dto.getDescricao());
         novoAgendamento.setData(dto.getData());
